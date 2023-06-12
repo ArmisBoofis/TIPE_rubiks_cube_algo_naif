@@ -1,22 +1,73 @@
 
 class Permutation:
-    def __init__(self, images: list[int]):
-        images.insert(0, 0) # Permet d'éviter les problèmes d'indice, puisqu'on compte à partir de 1
-
-        if not Permutation._est_valide(images):
-            raise ValueError("La liste donnée ne définit pas une permutation valide.")
-
-        self._images = images
+    def __init__(self, val: list[int]):
+        self._inverse = [False, []]
+        self._produit_cycles = [False, []]
+        self.images = val # On utilise ici le mutateur défini plus bas
     
+    @property
+    def images(self):
+        """Accesseur de la propriété <images>"""
+        return self._images[1:]
+    
+    @images.setter
+    def images(self, val: list[int]):
+        """Mutateur de la propriété <images>"""
+
+        val.insert(0, 0) # Permet d'éviter les problèmes d'indice, puisqu'on compte à partir de 1
+
+        if not Permutation._est_valide(val):
+            raise ValueError("La liste donnée ne définit pas une permutation valide")
+        
+        # On modifie la valeur des images et on marque toutes les autres propriétés calculables comme n'étant pas initialisées
+        self._images = val
+        self._inverse[0] = False
+        self._produit_cycles[0] = False
+
+    @property
     def inverse(self):
         """Renvoie l'inverse de la permutation"""
 
-        images_inverse = [0] * (len(self._images) - 1)
+        if not self._inverse[0]:
+            images_inverse = [0] * (len(self._images) - 1)
 
-        for k in range(1, len(self._images)):
-            images_inverse[self._images[k] - 1] = k
+            for k in range(1, len(self._images)):
+                images_inverse[self._images[k] - 1] = k
+            
+            self._inverse[1] = Permutation(images_inverse)
+            self._inverse[0] = True
+
+        return self._inverse[1]
+    
+    @property
+    def produit_cycles(self):
+        """Accesseur qui renvoie la liste des cycles figurant dans le produit
+        de cycles à supports disjoints associé à la permutation"""
+
+        if not self._produit_cycles[0]:
+            deja_vu = [False] * len(self._images)
+            cycles = []
+
+            for k in range(1, len(self._images)):
+                y = self._images[k]
+
+                if not deja_vu[y] and y != k:
+                    cycle = [k for k in range(len(self._images))]
+                    cycle[k] = y
+                    deja_vu[y] = True
+
+                    while self._images[y] != self._images[k]:
+                        cycle[y] = self._images[y]
+                        y = self._images[y]
+                        deja_vu[y] = True
+
+
+                    cycles.append(Permutation(cycle[1:]))
+            
+            self._produit_cycles[1] = cycles
+            self._produit_cycles[0] = True
         
-        return Permutation(images_inverse)
+        return self._produit_cycles[1]
 
     def __mul__(self, perm2):
         """Surcharge de l'opération de composition pour les permutations"""
@@ -64,7 +115,5 @@ class Permutation:
         return True
 
 # TODO :
-# - accesseur et mutateur pour _images
-# - décomposition en produit de cycles
 # - décomposition en produit de transpositions
 # - signature
