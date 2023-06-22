@@ -1,9 +1,11 @@
 
 class Permutation:
+    """Classe permettant de manipuler des permutations, avec opérations usuelles"""
+
     def __init__(self, val: list[int]):
         self._inverse = [False, []]
         self._produit_cycles = [False, []]
-        self.images = val # On utilise ici le mutateur défini plus bas
+        Permutation.images.fset(self, val) # On utilise ici le mutateur défini plus bas
     
     @property
     def images(self):
@@ -114,6 +116,89 @@ class Permutation:
         
         return True
 
+class Cycle(Permutation):
+    """Classe permettant de manipuler des permutations avec la notation de cycle"""
+
+    def __init__(self, val: tuple[int], n: int):
+        """Constructeur, qui implémente la conversion de la notation cycle à la notation usuelle"""
+
+        # On convertit d'abord les arguments en notation usuelle
+        arg_images = Cycle._cycle_vers_permutation(val, n)
+
+        # Si les arguments sont valides, on peut les passer au constructeur parent
+        if arg_images != None:
+            self._representation_cycle = val # On enregistre le tuple qui représente le cycle
+            super().__init__(arg_images)
+        
+        else:
+            raise ValueError("L'argument passé ne représente pas un cycle valide.")
+
+    @property
+    def images(self):
+        return super().images
+    
+    @images.setter
+    def images(self, img: tuple[tuple[int], int]):
+        """Surcharge du mutateur <images> de la classe Permutation, en prenant
+        en paramètre la notation cycle."""
+
+        try:
+            val, n = img
+        
+        except ValueError:
+            raise ValueError("L'argument passé n'est pas un tuple.")
+
+        else:
+            # On enregistre le tuple qui représente le cycle
+            self._representation_cycle = val
+
+            # On convertit les arguements en notation usuelle, puis on passe le résultat à la méthode parente
+            arg_images = Cycle._cycle_vers_permutation(val, n)
+
+            if arg_images != None:
+                Permutation.images.fset(self, arg_images)
+            
+            else:
+                raise ValueError("L'argument passé ne représente pas un cycle valide.")
+
+    @classmethod
+    def _est_valide(cls, val: tuple[int], n: int):
+        """Méthode vérifiant si une liste de nombre représentant un cycle est bien valide."""
+
+        deja_vu = [False] * (n + 1)
+
+        for e in val:
+            if e <= 0 or e > n or deja_vu[e]:
+                return False
+
+            deja_vu[e] = True
+
+        return True
+
+    @classmethod
+    def _cycle_vers_permutation(cls, val: tuple[int], n: int):
+        """Méthode permettant de convertir la notation cycle en notation usuelle."""
+
+        if Cycle._est_valide(val, n):
+                arg_images = [k for k in range(1, n + 1)] # On initialise la liste comme égale à l'identité
+
+                # On rajoute ensuite les éléments du cycle
+                for k in range(0, len(val) - 1):
+                    arg_images[val[k] - 1] = val[k + 1]
+
+                arg_images[val[-1] - 1] = val[0] # "Fermeture" du cycle
+
+                return arg_images
+
+        else:
+            return None
+
 # TODO :
-# - décomposition en produit de transpositions
+# - implémenter accesseur et mutateur pour un attribut representation_cycle
+# - surcharger la méthode inverse pour les cycles
+# - surcharger la méthode produit_cycle pour les cycles (directement renvoyer le cycle lui-même encapsulé dans une liste)
+# - surcharger __mul__ pour les cycles en prenant en compte les différents cas avec isinstance
+# - regarcer pour __rmul__
+# - surcharger la fonction __str__ dans la classe Cycle
+# - définir la décomposition en produit de transposition pour un cycle puis pour une permutation
 # - signature
