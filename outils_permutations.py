@@ -113,18 +113,22 @@ class Permutation:
 
         return self._signature[1]
 
-    def __mul__(self, perm2):
+    def __mul__(self, autre):
         """Surcharge de l'opération de composition pour les permutations"""
 
-        if len(perm2._images) != (self.n + 1):
-            raise ValueError("Multiplication de deux permutations sur des ensembles différents.")
+        if isinstance(autre, Permutation):
+            if len(autre._images) != (self.n + 1):
+                raise ValueError("Multiplication de deux permutations sur des ensembles différents.")
+            
+            nouvelles_images = [0] * self.n
+
+            for k in range(1, (self.n + 1)):
+                nouvelles_images[k - 1] = autre._images[self._images[k]]
+
+            return Permutation(nouvelles_images)
         
-        nouvelles_images = [0] * self.n
-
-        for k in range(1, (self.n + 1)):
-            nouvelles_images[k - 1] = perm2._images[self._images[k]]
-
-        return Permutation(nouvelles_images)
+        else:
+            raise TypeError(f"Impossible de mutliplier une permutation avec un objet de type {type(autre)}")
 
     def __str__(self) -> str:
         """Méthode pour afficher une permutation"""
