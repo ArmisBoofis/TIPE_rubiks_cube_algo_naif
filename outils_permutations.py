@@ -128,7 +128,7 @@ class Permutation:
             return Permutation(nouvelles_images)
         
         else:
-            raise TypeError(f"Impossible de mutliplier une permutation avec un objet de type {type(autre)}")
+            return NotImplemented
 
     def __str__(self) -> str:
         """Méthode pour afficher une permutation"""

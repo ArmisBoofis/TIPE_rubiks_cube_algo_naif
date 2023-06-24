@@ -1,3 +1,5 @@
+from outils_permutations import Permutation
+
 
 class VecteurOrientation():
     """Classe permettant de représenter un vecteur orientation."""
@@ -47,6 +49,27 @@ class VecteurOrientation():
         
         else:
             raise TypeError(f"Impossible d'additionner un vecteur orientation avec un objet de type {type(autre)}")
+
+    def __rmul__(self, perm):
+        """Méthode permettant de faire agir une permutation sur un vecteur orientation,
+        en mélangeant les éléments du vecteur orientation."""
+
+        if isinstance(perm, Permutation):
+            # Il faut vérifier que la permutation agit sur un ensemble de même taille que le vecteur
+            if perm.n == len(self.valeurs):
+                arg_valeurs = [0] * len(self.valeurs) # On initalise un nouveau vecteur orientation vierge
+
+                for k in range(len(self.valeurs)):
+                    arg_valeurs[k] = self.valeurs[perm.images[k] - 1]
+                
+                # On retourne le vecteur orientation correspondant
+                return VecteurOrientation(arg_valeurs, self.modulo)
+
+            else:
+                raise ValueError("Multiplication d'un vecteur orientation par une permutation de mauvaise taille.")
+        
+        else:
+            return NotImplemented
 
     def __str__(self) -> str:
         """Méthode permettant la représentation d'un vecteur orientation par une chaîne de caractères ( et
