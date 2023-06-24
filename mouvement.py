@@ -104,7 +104,7 @@ class Mouvement():
         else:
             raise TypeError(
                 "L'argument passé n'est pas un vecteur orientation.")
-    
+
     def __mul__(self, autre):
         """Méthode permettant de composer deux mouvements du Rubik's Cube."""
         if isinstance(autre, Mouvement):
@@ -118,6 +118,21 @@ class Mouvement():
 
             # On retourne le mouvement qui rassemble toutes les caractéristiques calculées précédemment :
             return Mouvement(arg_perm_sommets, arg_vect_sommets, arg_perm_aretes, arg_vect_aretes)
-        
+
         else:
             return NotImplemented
+    
+    def __str__(self) -> str:
+        """Méthode permettant de donner la représentation sous forme de chaîne de caractère
+        d'un mouvement du cube."""
+
+        ch = "" # Chaîne vierge
+
+        ch += "-" * 25 # Délimiteur du haut
+        ch += "\n Permutation sur les sommets :\n" + self.perm_sommets.__str__() + "\n"
+        ch += "Vecteur-orientation sur les sommets : " + self.vect_sommets.__str__() + "\n"
+        ch += "Permutation sur les arêtes :\n" + self.perm_aretes.__str__() + "\n"
+        ch += "Vecteur-orientation sur les arêtes : " + self.vect_aretes.__str__() + "\n"
+        ch += "-" * 25 + "\n" # Délimiteur du bas
+
+        return ch

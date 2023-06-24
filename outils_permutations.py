@@ -284,11 +284,12 @@ class Cycle(Permutation):
             # On initialise la liste comme égale à l'identité
             arg_images = [k for k in range(1, n + 1)]
 
-            # On rajoute ensuite les éléments du cycle
-            for k in range(0, len(val) - 1):
-                arg_images[val[k] - 1] = val[k + 1]
+            # On rajoute ensuite les éléments du cycle (s'il est non vide)
+            if len(val) >= 1:
+                for k in range(0, len(val) - 1):
+                    arg_images[val[k] - 1] = val[k + 1]
 
-            arg_images[val[-1] - 1] = val[0]  # "Fermeture" du cycle
+                arg_images[val[-1] - 1] = val[0]  # "Fermeture" du cycle
 
             return arg_images
 
