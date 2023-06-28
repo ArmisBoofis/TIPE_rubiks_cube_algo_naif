@@ -111,8 +111,8 @@ def melange() -> Mouvement:
     return executer(ch)
 
 def mvt_phase_1(c1: int, c2: int) -> str:
-    """Renvoie un mouvement qui envoie 3 sur c1 et 8 sur c2 ; permet la conjugaison
-    de la phase 1 de l'algorithme."""
+    """Renvoie un mouvement qui envoie le sommet 3 sur le sommet c1 et le sommet 8 sur le
+    sommet c2 ; permet la conjugaison de la phase 1 de l'algorithme."""
 
     if isinstance(c1, int) and isinstance(c2, int) and 1 <= c1 <= 8 and 1 <= c2 <= 8 and c1 != c2:
         # si c1 <= 4 et c2 <= 4, mvt1[c1][c2] contient un mouvement qui envoie 3 sur c1 et 8 sur c2
@@ -137,16 +137,16 @@ def mvt_phase_1(c1: int, c2: int) -> str:
         if c1 <= 4 and c2 >= 5:
             # cas le plus simple, on peut bouger les deux coins indépendamment
             prefixe = ['', 'UU', 'U', '', 'u']
-            sufixe = ['', 'D', 'DD', 'd', '']
+            suffixe = ['', 'D', 'DD', 'd', '']
 
-            return prefixe[c1] + sufixe[c2 - 4]
+            return prefixe[c1] + suffixe[c2 - 4]
         
         elif c1 >= 5 and c2 <= 4:
             # cas similaire au précédent, un peu plus compliqué
             prefixe = ['', 'BB', 'BBD', 'UrB', 'bL']
-            sufixe = ['', 'u', 'UU', 'U', '']
+            suffixe = ['', 'u', 'UU', 'U', '']
 
-            return prefixe[c1 - 4] + sufixe[c2]
+            return prefixe[c1 - 4] + suffixe[c2]
 
         elif c1 <= 4 and c2 <= 4:
             # cas plus compliqué, on a fait la disjonction de cas dans le tableau mvt1
@@ -159,10 +159,35 @@ def mvt_phase_1(c1: int, c2: int) -> str:
     else:
         return ValueError("Les valeurs données pour les coins c1 et c2 ne sont pas valides.")
 
+def mvt_phase_2(c1: int, c2: int) -> str:
+    """Renvoie un mouvement qui envoie le sommet 8 sur c1 et le sommet 7 sur c2,
+    ce qui permet la conjugaison de la phase 2 de l'algorithme."""
+
+    # Premier tableau qui donne la première partie du mouvement à effectuer
+    prefixe = ['', 'DLL', 'RR', 'r', 'BB', 'D', 'DD', 'd', '']
+
+    # Deuxième tableau qui donne la deuxième partie du mouvement à effectuer
+    suffixe = [
+        [],
+        ['', '', 'RR', 'B', 'rB', 'D', 'DD', 'd', ''],
+        ['', 'BL', '', '', 'B', 'BB', 'BLL', 'bd', 'b'],
+        ['', 'DLL', 'df', '', 'DL', 'D', 'DD', 'd', ''],
+        ['', 'FF', 'f', 'RR', '', 'DD', 'd', '', 'D'],
+        ['', 'RFF', 'RR', 'r', 'ru', '', 'RF', 'R', ''],
+        ['', 'bu', 'BRR', 'BB', 'b', '', '', 'BR', 'B'],
+        ['', 'l', 'lu', 'lUU', 'LL', 'L', '', '', 'LB'],
+        ['', 'FF', 'f', 'fu', 'FFU', 'FL', 'F', '', '']
+    ]
+
+    # on renvoie ensuite la solution complète
+    return prefixe[c1] + suffixe[c1][c2]
+
 # ---------------------------------- ALGORITHME DE RÉSOLUTION ----------------------------------
 
 # On se donne une configuration initiale
 configuration = melange()
+
+configuration_bis = configuration
 
 print("Configuration initiale :")
 print(configuration)
@@ -186,5 +211,35 @@ for transposition in configuration.perm_sommets.produit_transpositions:
     configuration *= executer(Mi_txt) * M0 * executer(M_txt)
     sol += Mi_txt + M0_txt + M_txt
 
-print("Configuration après le positionnement des sommets :")
-print("Solution pour le moment : ", sol)
+
+print('Configuration après la phase 1 :')
+print(configuration)
+
+# PHASE 2 : orientation des sommets
+
+
+M0, M0_txt = (D * r) ** 3 * (d * R) ** 3, 'DrDrDrdRdRdR' # Ce mouvement ne change pas le positionnement des sommets, et change l'orientation des sommets 7 et 8
+i1, i2 = 0, 1 # Indices utilisés pour parcourir les composantes du vecteur orientation sur les sommets
+
+# On repète les ré-orientations jusqu'à ce que tous les coins soient bien orientés
+while i1 < 7:
+    vect = configuration.vect_sommets.valeurs # On récupère la liste des composantes du vecteur orientation sur les sommets actuel
+
+    if vect[i1] == 0:
+        i1 += 1
+    
+    elif vect[i2] == 0 or i2 <= i1:
+        i2 += 1
+    
+    else:
+        # on a i1 < i2 et vect[i1] != 0 et vect[i2] != 0
+        # on calcule le mouvement par lequel on va conjuguer M0
+        M_txt = mvt_phase_2(i1 + 1, i2 + 1)
+        Mi_txt = inverser(M_txt)
+
+        # on multiplie enfin <configuration> par <M0> conjugé par <M>
+        configuration *= executer(Mi_txt) * M0 * executer(M_txt)
+        sol += Mi_txt + M0_txt + M_txt
+
+print('Configuration après la phase 2 :')
+print(configuration)
