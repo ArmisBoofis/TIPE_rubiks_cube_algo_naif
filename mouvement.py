@@ -121,18 +121,36 @@ class Mouvement():
 
         else:
             return NotImplemented
-    
+
+    def __pow__(self, exp: int):
+        """Méthode implémentant l'exponentiation rapide pour calculer une puissance entière d'un mouvement."""
+
+        if isinstance(exp, int) and exp > 1:
+            if exp % 2 == 0:
+                return (self * self).__pow__(exp // 2)
+            
+            else:
+                return self * (self * self).__pow__((exp - 1) // 2)
+        
+        elif exp == 1:
+            return Mouvement(self.perm_sommets, self.vect_sommets, self.perm_aretes, self.vect_aretes)
+        
+        else:
+            return NotImplemented
+
     def __str__(self) -> str:
         """Méthode permettant de donner la représentation sous forme de chaîne de caractère
         d'un mouvement du cube."""
 
-        ch = "" # Chaîne vierge
+        ch = ""  # Chaîne vierge
 
-        ch += "-" * 25 # Délimiteur du haut
+        ch += "-" * 25  # Délimiteur du haut
         ch += "\n Permutation sur les sommets :\n" + self.perm_sommets.__str__() + "\n"
-        ch += "Vecteur-orientation sur les sommets : " + self.vect_sommets.__str__() + "\n"
+        ch += "Vecteur-orientation sur les sommets : " + self.vect_sommets.__str__() + \
+            "\n"
         ch += "Permutation sur les arêtes :\n" + self.perm_aretes.__str__() + "\n"
-        ch += "Vecteur-orientation sur les arêtes : " + self.vect_aretes.__str__() + "\n"
-        ch += "-" * 25 + "\n" # Délimiteur du bas
+        ch += "Vecteur-orientation sur les arêtes : " + self.vect_aretes.__str__() + \
+            "\n"
+        ch += "-" * 25 + "\n"  # Délimiteur du bas
 
         return ch

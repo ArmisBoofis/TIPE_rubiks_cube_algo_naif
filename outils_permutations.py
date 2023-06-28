@@ -185,7 +185,7 @@ class Cycle(Permutation):
                 "L'argument passé ne représente pas un cycle valide.")
 
     @property
-    def images(self):
+    def images(self) -> list[int]:
         return super().images
 
     @images.setter
@@ -214,7 +214,7 @@ class Cycle(Permutation):
                     "L'argument passé ne représente pas un cycle valide.")
 
     @property
-    def representation_cycle(self):
+    def representation_cycle(self) -> tuple[int]:
         return self._representation_cycle
 
     @property
@@ -253,7 +253,7 @@ class Cycle(Permutation):
         return self._produit_transpositions[1]
 
     @property
-    def signature(self):
+    def signature(self) -> int:
         """Méthode qui calcule la signature du cycle."""
         return (-1) ** (len(self.representation_cycle) - 1)
 

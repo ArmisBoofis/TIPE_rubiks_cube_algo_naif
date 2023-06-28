@@ -29,7 +29,7 @@ class VecteurOrientation():
     def valeurs(self, val: list[int]):
         self._valeurs = val
         self._reste()
-    
+
     @property
     def n(self):
         """Retourne la taille du vecteur orientation"""
