@@ -8,6 +8,7 @@ class Permutation:
         self._produit_cycles = [False, []]
         self._produit_transpositions = [False, []]
         self._signature = [False, 1]
+        self._produit_trois_cycles = [False, []]
 
         # On utilise ici le mutateur défini plus bas
         Permutation.images.fset(self, val)
@@ -40,6 +41,7 @@ class Permutation:
         self._produit_cycles[0] = False
         self._produit_transpositions[0] = False
         self._signature = [False, 1]
+        self._produit_trois_cycles[0] = False
 
     @property
     def inverse(self):
@@ -114,6 +116,49 @@ class Permutation:
             self._signature[0] = True
 
         return self._signature[1]
+    
+    @property
+    def produit_trois_cycles(self):
+        """Dans le cas où la permutation appartient au groupe alterné, cette
+        méthode renvoie la décomposition de la permutation en 3-cycles."""
+
+        if not self._produit_trois_cycles[0]:
+            # On vérifie d'abord que l'on peut effectuer la décomposition
+            if self.signature == 1:
+                self._produit_trois_cycles[1] = [] # On réinitialise l'attribut
+
+                # On parcourt les transpositions deux par deux
+                for k in range(len(self.produit_transpositions) // 2):
+                    # On trie les éléments du support des deux transpositions pour les comparer
+                    transpo1 = self.produit_transpositions[2 * k].representation_cycle
+                    transpo2 = self.produit_transpositions[2 * k + 1].representation_cycle
+
+                    i, j, k, l = min(transpo1), max(transpo1), min(transpo2), max(transpo2)
+
+                    # Les quatres premières conditions traitent le cas où les supports ne sont pas disjoints
+                    if i == k:
+                        self._produit_trois_cycles[1].append(Cycle((i, l, j), self.n))
+                    
+                    elif j == l:
+                        self._produit_trois_cycles[1].append(Cycle((j, k, i), self.n))
+                    
+                    elif j == k:
+                        self._produit_trois_cycles[1].append(Cycle((j, l, i), self.n))
+                    
+                    elif i == l:
+                        self._produit_trois_cycles[1].append(Cycle((i, k, j), self.n))
+                    
+                    # Ici, c'est le cas où les supports sont disjoints
+                    else:
+                        self._produit_trois_cycles[1].append(Cycle((i, k, j), self.n))
+                        self._produit_trois_cycles[1].append(Cycle((k, l, i), self.n))
+
+                self._produit_trois_cycles[0] = True # On marque bien que cet attribut a été calculé
+            else:
+                return NotImplemented
+        
+        
+        return self._produit_trois_cycles[1]
 
     def __mul__(self, autre):
         """Surcharge de l'opération de composition pour les permutations"""
